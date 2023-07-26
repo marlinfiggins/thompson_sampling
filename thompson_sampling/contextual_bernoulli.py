@@ -1,7 +1,6 @@
-from enum import Enum
 import numpy as np
 from scipy.optimize import minimize
-from scipy.stats import beta as Beta
+from scipy.stats import norm as Normal
 from scipy.stats import bernoulli as Bernoulli
 
 FeatureWeights = np.ndarray  # Should have shape (n_features, n_arms)
@@ -38,6 +37,10 @@ class BayesOnlineLogistic:
 
         # Sample initial weights from prior
         self.weights = self.sample_weights()
+
+    @property
+    def weight_dists(self):
+        return [Normal(m, 1 / q) for m, q in zip(self.means, self.precisions)]
 
     def sample_weights(self):
         return np.random.normal(
