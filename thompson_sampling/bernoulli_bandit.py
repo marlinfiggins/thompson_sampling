@@ -8,8 +8,8 @@ class BernoulliBandit:
         self.probs = probs
         self.reward_dist = [Bernoulli(p) for p in self.probs]
 
-    def sample(self, k):
-        return self.reward_dist[k].rvs()
+    def sample(self, arm):
+        return self.reward_dist[arm].rvs()
 
 
 class ThompsonSampling:
