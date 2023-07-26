@@ -56,11 +56,10 @@ class BayesOnlineLogistic:
         return reg_term + log_lik.sum()
 
     def grad(self, weights, features, rewards):
-        # TODO: Fix gradient
         reg_term = self.precisions * (weights - self.means)
         log_like = (
             features
-            * np.power(1.0 + np.exp(np.dot(features, weights)), -1)[:, None]
+            * np.power(1.0 + np.exp(-np.dot(features, weights)), -1)[:, None]
             - rewards[:, None] * features
         ).sum(axis=0)
         return reg_term + log_like
@@ -71,6 +70,7 @@ class BayesOnlineLogistic:
         self.minimizer = minimize(
             lambda w: self.loss(w, features, rewards),
             x0=self.weights,
+            jac=lambda w: self.grad(w, features, rewards),
         )
         self.weights = self.minimizer.x
         self.means = self.weights
