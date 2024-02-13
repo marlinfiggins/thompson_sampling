@@ -27,7 +27,7 @@ class EpsilonGreedy:
         self.expected_reward = np.zeros(n_arms)
         self.times_chosen = np.zeros(n_arms)
 
-    def update_q(self, arm: int, reward: float):
+    def update_expected_rewards(self, arm: int, reward: float):
         self.times_chosen[arm] += 1
 
         # Online update for the mean reward
@@ -60,7 +60,7 @@ class UCB:
         self.times_chosen = np.zeros(n_arms)
         self.total_actions = 0
 
-    def update_q_value(self, arm, reward):
+    def update_expected_rewards(self, arm, reward):
         # Update Q-value for the pulled arm
         self.times_chosen[arm] += 1
         # Online update for the expected reward
@@ -99,9 +99,9 @@ class ThompsonSampling:
 
     @property
     def _theta(self):
-        return [Beta(self.alpha, self.beta) for k in range(self.n_arms)]
+        return [Beta(self.alpha, self.beta) for _ in range(self.n_arms)]
 
-    def update_q(self, arm, reward):
+    def update_expected_rewards(self, arm, reward):
         if reward == 0:
             self.alpha[arm] += 1
         else:
