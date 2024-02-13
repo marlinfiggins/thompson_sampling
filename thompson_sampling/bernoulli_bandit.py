@@ -99,10 +99,10 @@ class ThompsonSampling:
 
     @property
     def _theta(self):
-        return [Beta(self.alpha[k], self.beta[k]) for k in range(self.n_arms)]
+        return [Beta(a=self.alpha[arm], b=self.beta[arm]) for arm in range(self.n_arms)]
 
     def update_expected_rewards(self, arm, reward):
-        if reward == 0:
+        if reward == 1:
             self.alpha[arm] += 1
         else:
             self.beta[arm] += 1
