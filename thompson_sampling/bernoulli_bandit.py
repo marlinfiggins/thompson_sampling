@@ -31,9 +31,10 @@ class EpsilonGreedy:
         self.times_chosen[arm] += 1
 
         # Online update for the mean reward
-        self.expected_reward[arm] += (
-            reward - self.expected_reward[arm]
-        ) / self.times_chosen[arm]
+        n = self.times_chosen[arm]
+        self.expected_reward[arm] = (
+            self.expected_reward[arm] * (1 - 1 / n) + reward / n
+        )
         return None
 
     def choose_arm(self):
@@ -61,16 +62,17 @@ class UCB:
         self.total_actions = 0
 
     def update_expected_rewards(self, arm, reward):
-        # Update Q-value for the pulled arm
         self.times_chosen[arm] += 1
+        # Update Q-value for the pulled arm
         # Online update for the expected reward
-        self.expected_reward[arm] += (
-            reward - self.expected_reward[arm]
-        ) / self.times_chosen[arm]
+        n = self.times_chosen[arm]
+        self.expected_reward[arm] = (
+            self.expected_reward[arm] * (1 - 1 / n) + reward / n
+        )
 
     def choose_arm(self):
         ucb_values = self.expected_reward + self.c * np.sqrt(
-            np.log(self.total_actions + 1) / (self.times_chosen + 1e-4)
+            np.log10(self.total_actions + 1) / (self.times_chosen)
         )
         return np.argmax(ucb_values)
 
@@ -87,6 +89,7 @@ class ThompsonSampling:
     - alpha (float): Alpha parameters of the beta distribution for each arm.
     - beta (float): Beta parameters of the beta distribution for each arm.
     """
+
     def __init__(
         self,
         n_arms: int,
@@ -99,7 +102,14 @@ class ThompsonSampling:
 
     @property
     def _theta(self):
-        return [Beta(a=self.alpha[arm], b=self.beta[arm]) for arm in range(self.n_arms)]
+        return [
+            Beta(a=self.alpha[arm], b=self.beta[arm])
+            for arm in range(self.n_arms)
+        ]
+
+    @property
+    def expected_reward(self):
+        return self.alpha / (self.alpha + self.beta)
 
     def update_expected_rewards(self, arm, reward):
         if reward == 1:
