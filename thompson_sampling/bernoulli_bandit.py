@@ -63,6 +63,7 @@ class UCB:
 
     def update_expected_rewards(self, arm, reward):
         self.times_chosen[arm] += 1
+        self.total_actions += 1
         # Update Q-value for the pulled arm
         # Online update for the expected reward
         n = self.times_chosen[arm]
@@ -72,7 +73,7 @@ class UCB:
 
     def choose_arm(self):
         ucb_values = self.expected_reward + self.c * np.sqrt(
-            np.log10(self.total_actions + 1) / (self.times_chosen)
+            np.log10(self.total_actions + 1) / (self.times_chosen + 1e-6)
         )
         return np.argmax(ucb_values)
 
